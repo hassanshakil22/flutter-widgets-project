@@ -1,9 +1,20 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_native_splash/flutter_native_splash.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:flutter_widgets/app_setup/core/services/dependency_inject.dart';
+import 'package:flutter_widgets/app_setup/core/services/share_pref.dart';
 import 'package:flutter_widgets/app_setup/themes/app_themes.dart';
+import 'package:hive_flutter/hive_flutter.dart';
 import 'package:provider/provider.dart';
 
-void main() {
+Future<void> main() async {
+    WidgetsBinding widgetsBinding = WidgetsFlutterBinding.ensureInitialized();
+  FlutterNativeSplash.preserve(widgetsBinding: widgetsBinding);
+  setupLocator();
+  await UserPrefs.init();
+  await Hive.initFlutter();
+  runApp(const MyApp());
+  FlutterNativeSplash.remove();
   runApp(const MyApp());
 }
 
