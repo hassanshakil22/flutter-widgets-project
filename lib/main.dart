@@ -11,9 +11,12 @@ Future<void> main() async {
     WidgetsBinding widgetsBinding = WidgetsFlutterBinding.ensureInitialized();
   FlutterNativeSplash.preserve(widgetsBinding: widgetsBinding);
   setupLocator();
+  // to initialize my User Prefs Service
   await UserPrefs.init();
+  // to initialize my Hive Service
   await Hive.initFlutter();
   runApp(const MyApp());
+  // its for the flutter native splash which isnt integrated currently 
   FlutterNativeSplash.remove();
   runApp(const MyApp());
 }

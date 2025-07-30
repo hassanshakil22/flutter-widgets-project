@@ -9,8 +9,7 @@ class PinKeyboard extends StatefulWidget {
   });
 
   final ValueChanged<String> onKeyboardTap;
-  final VoidCallback
-  onBackspace;
+  final VoidCallback onBackspace;
 
   @override
   State<PinKeyboard> createState() => _PinKeyboardState();
@@ -24,19 +23,31 @@ class _PinKeyboardState extends State<PinKeyboard> {
         // Row 1
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-          children: [1, 2, 3].map((num) => _buildKey(num.toString())).toList(),
+          children: [
+            1,
+            2,
+            3,
+          ].map((numb) => _buildKey(numb.toString())).toList(),
         ),
         SizedBox(height: 20),
         // Row 2
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-          children: [4, 5, 6].map((num) => _buildKey(num.toString())).toList(),
+          children: [
+            4,
+            5,
+            6,
+          ].map((numb) => _buildKey(numb.toString())).toList(),
         ),
         SizedBox(height: 20),
         // Row 3
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-          children: [7, 8, 9].map((num) => _buildKey(num.toString())).toList(),
+          children: [
+            7,
+            8,
+            9,
+          ].map((numb) => _buildKey(numb.toString())).toList(),
         ),
         SizedBox(height: 20),
         // Row 4
@@ -63,7 +74,7 @@ class _PinKeyboardState extends State<PinKeyboard> {
             style: TextStyle(
               fontSize: 22,
               color: AppColors.blackColor,
-              fontWeight: FontWeight.bold, // Lighter weight looks more modern
+              fontWeight: FontWeight.bold,
             ),
           ),
         ),
@@ -80,7 +91,7 @@ class _PinKeyboardState extends State<PinKeyboard> {
       color: Colors.transparent,
       child: InkWell(
         borderRadius: BorderRadius.circular(40),
-        onTap: widget.onBackspace, 
+        onTap: widget.onBackspace,
         child: Container(
           width: 80,
           height: 80,
