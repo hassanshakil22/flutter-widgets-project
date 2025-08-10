@@ -6,6 +6,7 @@ import 'package:flutter_widgets/app_setup/core/consts/api_urls.dart';
 import 'package:flutter_widgets/app_setup/core/consts/http_codes.dart';
 import 'package:flutter_widgets/app_setup/core/consts/http_exceptions.dart';
 import 'package:http/http.dart' as http;
+import 'package:http_parser/http_parser.dart';
 
 class HttpService {
   final String baseUrl;
@@ -71,6 +72,74 @@ class HttpService {
             },
           )
           .timeout(timeout);
+
+      _log("Response Status: ${response.statusCode}");
+      _log("Response Body: ${response.body}");
+
+      _handleErrors(response.statusCode, json.decode(response.body));
+      return json.decode(response.body);
+    } on SocketException {
+      throw const SocketException("No internet connection");
+    } on TimeoutException {
+      throw TimeoutException('API not responded in time');
+    }
+  }
+
+  // used to post form data with image files in it
+  Future<dynamic> postFormData(
+    String path, {
+    required Map<String, dynamic> requestBody,
+  }) async {
+    try {
+      final uri = Uri.parse(baseUrl + path);
+      var request = http.MultipartRequest('POST', uri);
+      request.headers['Authorization'] = "Bearer \${AuthProvider.token}";
+
+      for (var entry in requestBody.entries) {
+        if (entry.value is List<File>) {
+          for (File file in entry.value) {
+            final ext = file.path.split('.').last.toLowerCase();
+            final mimeType = (ext == 'png')
+                ? MediaType('image', 'png')
+                : MediaType('image', 'jpeg');
+
+            request.files.add(
+              await http.MultipartFile.fromPath(
+                entry.key,
+                file.path,
+                contentType: mimeType,
+              ),
+            );
+          }
+        } else if (entry.value is File) {
+          final ext = (entry.value as File).path.split('.').last.toLowerCase();
+          final mimeType = (ext == 'png')
+              ? MediaType('image', 'png')
+              : MediaType('image', 'jpeg');
+
+          request.files.add(
+            await http.MultipartFile.fromPath(
+              entry.key,
+              (entry.value as File).path,
+              contentType: mimeType,
+            ),
+          );
+        } else if (entry.value is List || entry.value is Map) {
+          for (var i = 0; i < entry.value.length; i++) {
+            request.fields['${entry.key}[$i]'] = entry.value[i].toString();
+          }
+        } else {
+          request.fields[entry.key] = entry.value.toString();
+        }
+      }
+
+      _log("POST FORM Request: $uri");
+      _log("Headers: Authorization: ${request.headers}");
+      _log("Request Fields: ${request.fields}");
+      _log("Files: ${request.files.map((f) => f.filename).toList()}");
+
+      var streamedResponse = await request.send().timeout(timeout);
+      var response = await http.Response.fromStream(streamedResponse);
 
       _log("Response Status: ${response.statusCode}");
       _log("Response Body: ${response.body}");
